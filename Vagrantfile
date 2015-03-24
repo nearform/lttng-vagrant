@@ -8,8 +8,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
   config.vm.box_url = "https://atlas.hashicorp.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box"
   config.vm.provision :shell, :path => "bootstrap.sh"
+  config.vm.network :private_network, ip: '10.0.13.37'
 
-  config.vm.synced_folder "~/Development/vagrant/shared", "/vagrant/shared"
   config.vm.provision :shell, path: "bootstrap.sh"
  
   config.vm.provider :virtualbox do |vb|

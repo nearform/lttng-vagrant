@@ -25,7 +25,13 @@ mkdir ${path}/Dev/
 
 cd ${path}/Dev/
 git clone git://git.urcu.so/userspace-rcu.git
-cd userspace-rcu
+git clone git://git.efficios.com/babeltrace.git
+git clone git://git.lttng.org/lttng-ust.git
+git clone git://git.lttng.org/lttng-tools.git
+git clone git://git.lttng.org/lttng-modules.git
+git clone https://github.com/iojs/io.js.git
+
+cd ${path}/Dev/userspace-rcu
 git checkout stable-0.8
 ./bootstrap
 ./configure
@@ -36,9 +42,7 @@ ldconfig
 export PYTHON="python3"
 export PYTHON_CONFIG="/usr/bin/python3-config"
 
-cd ${path}/Dev/
-git clone git://git.efficios.com/babeltrace.git
-cd babeltrace
+cd ${path}/Dev/babeltrace
 git checkout stable-1.2
 ./bootstrap 
 ./configure --enable-python-bindings
@@ -46,9 +50,7 @@ make
 make install
 ldconfig
 
-cd ${path}/Dev/
-git clone git://git.lttng.org/lttng-ust.git
-cd lttng-ust
+cd ${path}/Dev/lttng-ust
 git checkout stable-2.6
 ./bootstrap
 ./configure
@@ -56,9 +58,7 @@ make
 make install
 ldconfig
 
-cd ${path}/Dev/
-git clone git://git.lttng.org/lttng-tools.git
-cd lttng-tools
+cd ${path}/Dev/lttng-tools
 git checkout stable-2.6
 ./bootstrap 
 ./configure --enable-python-bindings
@@ -67,9 +67,7 @@ make install
 ldconfig
 
 
-cd ${path}/Dev/
-git clone git://git.lttng.org/lttng-modules.git
-cd lttng-modules
+cd ${path}/Dev/lttng-modules
 git checkout stable-2.6
 make
 make modules_install
@@ -82,9 +80,7 @@ usermod -aG tracing vagrant
 lttng-sessiond -b
 
 # install io.js from source as we need to build with-lttng support
-cd ${path}/Dev/
-git clone https://github.com/iojs/io.js.git
-cd io.js
+cd ${path}/Dev/io.js
 git checkout v1.4.2
 ./configure --with-lttng
 make

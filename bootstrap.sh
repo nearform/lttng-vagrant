@@ -1,24 +1,91 @@
 #!/usr/bin/env bash
 
+path="${PWD}"
+
 apt-get install -y git curl wget build-essential gcc
 
 # install node
 curl -sL https://deb.nodesource.com/setup | sudo bash -
 apt-get update
+apt-get upgrade
 apt-get install -y nodejs
 
 # install lttng
-apt-add-repository -y ppa:lttng/ppa
-apt-get update
-apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
+#apt-add-repository -y ppa:lttng/ppa
+#apt-get update
+#apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
+
+# Download dependencies for building lttng from scratch...
+apt-get install -y python3-dev uuid-dev libc6-dev libglib2.0-dev bison Flex
+apt-get install -y libtool autoconf libxml2-dev libpopt-dev python3-sphinx
+apt-get install -y swig
+
+# Create a folder to put all compiled programs in.
+mkdir ${path}/Dev/
+
+cd ${path}/Dev/
+git clone git://git.urcu.so/userspace-rcu.git
+git clone git://git.efficios.com/babeltrace.git
+git clone git://git.lttng.org/lttng-ust.git
+git clone git://git.lttng.org/lttng-tools.git
+git clone git://git.lttng.org/lttng-modules.git
+git clone https://github.com/iojs/io.js.git
+
+cd ${path}/Dev/userspace-rcu
+git checkout stable-0.8
+./bootstrap
+./configure
+make
+make install
+ldconfig
+
+export PYTHON="python3"
+export PYTHON_CONFIG="/usr/bin/python3-config"
+
+cd ${path}/Dev/babeltrace
+git checkout stable-1.2
+./bootstrap 
+./configure --enable-python-bindings
+make
+make install
+ldconfig
+
+cd ${path}/Dev/lttng-ust
+git checkout stable-2.6
+./bootstrap
+./configure
+make
+make install
+ldconfig
+
+cd ${path}/Dev/lttng-tools
+git checkout stable-2.6
+./bootstrap 
+./configure --enable-python-bindings
+make
+make install
+ldconfig
+
+
+cd ${path}/Dev/lttng-modules
+git checkout stable-2.6
+make
+make modules_install
+depmod -a
+
+# Add a tracing group to access kernel stuff in lttng without needing sudo
+groupadd -r tracing ###NOT NEEDED
+usermod -aG tracing vagrant
+
+lttng-sessiond -b
 
 # install io.js from source as we need to build with-lttng support
-git clone https://github.com/iojs/io.js.git
-cd io.js
+cd ${path}/Dev/io.js
 git checkout v1.4.2
 ./configure --with-lttng
 make
 make install
+
 
 #wget https://iojs.org/dist/v1.4.2/iojs-v1.4.2-linux-x64.tar.xz
 #tar xf iojs-v1.4.2-linux-x64.tar.xz

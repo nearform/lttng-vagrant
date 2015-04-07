@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :shell, :path => "bootstrap.sh"
   config.vm.network :private_network, ip: '10.0.13.37'
 
-  config.vm.provision :shell, path: "bootstrap.sh"
+  config.vm.synced_folder "~/Development/vagrant/shared", "/vagrant/shared"
  
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", "2048"]

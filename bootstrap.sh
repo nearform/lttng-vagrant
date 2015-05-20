@@ -2,86 +2,42 @@
 
 path="${PWD}"
 
-apt-get install -y git curl wget build-essential gcc
-
-# install node
-curl -sL https://deb.nodesource.com/setup | sudo bash -
-apt-get update
-apt-get upgrade
-apt-get install -y nodejs
-
-# install lttng
-#apt-add-repository -y ppa:lttng/ppa
-#apt-get update
-#apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
-
-# Download dependencies for building lttng from scratch...
-apt-get install -y python3-dev uuid-dev libc6-dev libglib2.0-dev bison Flex
-apt-get install -y libtool autoconf libxml2-dev libpopt-dev python3-sphinx
-apt-get install -y swig
-
-# Create a folder to put all compiled programs in.
-mkdir ${path}/Dev/
-
-cd ${path}/Dev/
-git clone git://git.urcu.so/userspace-rcu.git
-git clone git://git.efficios.com/babeltrace.git
+mkdir ${path}/src
+cd ${path}/src
+sudo apt-get update
+sudo apt-get -y install build-essential libtool flex bison \
+                        libpopt-dev uuid-dev libglib2.0-dev autoconf \
+                        git libxml2-dev
 git clone git://git.lttng.org/lttng-ust.git
-git clone git://git.lttng.org/lttng-tools.git
 git clone git://git.lttng.org/lttng-modules.git
-git clone https://github.com/iojs/io.js.git
+git clone git://git.lttng.org/lttng-tools.git
+git clone git://git.lttng.org/userspace-rcu.git
+git clone git://git.efficios.com/babeltrace.git
+git clone https://github.com/nodejs/io.js
 
-cd ${path}/Dev/userspace-rcu
-git checkout stable-0.8
-./bootstrap
-./configure
-make
-make install
-ldconfig
+cd userspace-rcu
+./bootstrap && ./configure && make -j 4 && sudo make install
+sudo ldconfig
 
-export PYTHON="python3"
-export PYTHON_CONFIG="/usr/bin/python3-config"
+cd ../lttng-ust
+./bootstrap && ./configure && make -j 4 && sudo make install
+sudo ldconfig
 
-cd ${path}/Dev/babeltrace
-git checkout stable-1.2
-./bootstrap 
-./configure --enable-python-bindings
-make
-make install
-ldconfig
+cd ../lttng-modules
+make && sudo make modules_install
+sudo depmod -a
 
-cd ${path}/Dev/lttng-ust
-git checkout stable-2.6
-./bootstrap
-./configure
-make
-make install
-ldconfig
+cd ../lttng-tools
+./bootstrap && ./configure && make -j 4 && sudo make install
+sudo ldconfig
+sudo cp extras/lttng-bash_completion /etc/bash_completion.d/lttng
 
-cd ${path}/Dev/lttng-tools
-git checkout stable-2.6
-./bootstrap 
-./configure --enable-python-bindings
-make
-make install
-ldconfig
-
-
-cd ${path}/Dev/lttng-modules
-git checkout stable-2.6
-make
-make modules_install
-depmod -a
-
-# Add a tracing group to access kernel stuff in lttng without needing sudo
-groupadd -r tracing ###NOT NEEDED
-usermod -aG tracing vagrant
-
-lttng-sessiond -b
+cd ../babeltrace
+./bootstrap && ./configure && make -j 4 && sudo make install
+sudo ldconfig
 
 # install io.js from source as we need to build with-lttng support
-cd ${path}/Dev/io.js
-git checkout v1.4.2
+cd ../io.js
 ./configure --with-lttng
 make
 make install

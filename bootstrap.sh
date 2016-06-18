@@ -13,7 +13,7 @@ git clone git://git.lttng.org/lttng-modules.git
 git clone git://git.lttng.org/lttng-tools.git
 git clone git://git.lttng.org/userspace-rcu.git
 git clone git://git.efficios.com/babeltrace.git
-git clone https://github.com/nodejs/io.js
+git clone https://github.com/nodejs/node
 
 cd userspace-rcu
 ./bootstrap && ./configure && make -j 4 && sudo make install
@@ -37,7 +37,7 @@ cd ../babeltrace
 sudo ldconfig
 
 # install io.js from source as we need to build with-lttng support
-cd ../io.js
+cd ../node
 ./configure --with-lttng
 make
 make install

@@ -39,7 +39,7 @@ sudo ldconfig
 # install io.js from source as we need to build with-lttng support
 cd ../node
 ./configure --with-lttng
-make
+make -j 4
 make install
 
 

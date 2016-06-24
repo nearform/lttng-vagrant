@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :private_network, ip: '10.0.13.37'
 
   # uncomment the line below to create a shard workspace
-  # config.vm.synced_folder "~/work/vagrant/shared", "/vagrant/shared"
+  config.vm.synced_folder "./shared", "/vagrant/shared"
 
   config.vm.provision "docker" do |d|
   end
